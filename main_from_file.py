@@ -29,3 +29,11 @@ class Plotter:
         by_label = OrderedDict(zip(labels, handles))
         plt.legend(by_label.values(), by_label.keys())
         plt.show()
+
+
+class Point:
+    def __init__(self, name, x, y):
+        self.name = name
+        self.x = x
+        self.y = y
+
