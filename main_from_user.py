@@ -30,3 +30,4 @@ class Plotter:
         plt.legend(by_label.values(), by_label.keys())
         plt.show()
 
+

@@ -24,6 +24,15 @@ class Plotter:
         else:
             plt.plot(x, y, "ko", label='Unclassified')
 
+    def green_point(self, x, y):
+        plt.plot(x, y, "go")
+
+    def red_point(self, x, y):
+        plt.plot(x, y, "ro")
+
+    def blue_point(self, x, y):
+        plt.plot(x, y, "bo")
+
     def show(self):
         handles, labels = plt.gca().get_legend_handles_labels()
         by_label = OrderedDict(zip(labels, handles))
