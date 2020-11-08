@@ -105,6 +105,9 @@ class Polygon:
             except ZeroDivisionError:
                 m_point = _huge
 
+            if m_edge < 0 and a.x == point.x:
+                continue
+
             if m_point >= m_edge:
                 # The ray intersects with the edge
                 inside = not inside
@@ -113,16 +116,63 @@ class Polygon:
         return inside
 
 # define a boundary function
+    def boundary(self, point):
+        _eps = 0.00001
+        location = 'outside'
+        for edge in self.edges:
+            # Make sure A is the lower point of the edge
+            a, b = edge[0], edge[1]
+            if a.y > b.y:
+                a, b = b, a
 
+            crossproduct = (point.y - a.y) * (b.x - a.x) - (point.x - a.x) * (b.y - a.y)
+
+            # compare versus epsilon for floating point values, or != 0 if using integers
+            if abs(crossproduct) > _eps:
+                continue
+
+            dotproduct = (point.x - a.x) * (b.x - a.x) + (point.y - a.y) * (b.y - a.y)
+            if dotproduct < 0:
+                continue
+
+            squaredlengthba = (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y)
+            if dotproduct > squaredlengthba:
+                continue
+
+            location = 'boundary'
+        return location
 
 # Read a list of x, y coordinates from a comma-separated values (CSV) file
+polygon_points = []
+with open('/Users/ak/Desktop/assignment_1/polygon_no_id.csv', 'r') as f:
+    print(f.readline())
+    for line in f.readlines():
+        items = line.split(',')
+        name = str(items[0])
+        x = float(items[1])
+        y = float(items[2])
+        polygon_points.append(Point(name, x, y))
 
+p = Polygon(polygon_points)
+n_points = len(polygon_points)
+
+xs = []
+ys = []
+for point in polygon_points:
+    xs.append(point.x)
+for point in polygon_points:
+    ys.append(point.y)
 
 # Find coordinates for MBR
-
+min_x = min(xs)
+max_x = max(xs)
+min_y = min(ys)
+max_y = max(ys)
 
 # make a list of 4 points so that we can make a polygon
-
+mbr_points = [[min_x, min_y], [min_x, max_y], [max_x, max_y], [max_x, min_y], [min_x, min_y]]
+mbr_x = [min_x, min_x, max_x, max_x, min_x]
+mbr_y = [min_y, max_y, max_y, min_y, min_y]
 
 # make a list of coordinates for testing from csv
 
