@@ -145,7 +145,7 @@ class Polygon:
 # Read a list of x, y coordinates from a comma-separated values (CSV) file
 polygon_points = []
 with open('/Users/ak/Desktop/assignment_1/polygon_no_id.csv', 'r') as f:
-    print(f.readline())
+#    print(f.readline())
     for line in f.readlines():
         items = line.split(',')
         name = str(items[0])
@@ -175,13 +175,40 @@ mbr_x = [min_x, min_x, max_x, max_x, min_x]
 mbr_y = [min_y, max_y, max_y, min_y, min_y]
 
 # make a list of coordinates for testing from csv
-
+input_points = []
+with open('/Users/ak/Desktop/assignment_1/input_no_id.csv', 'r') as f:
+    for line in f.readlines():
+        items = line.split(',')
+        name = str(items[0])
+        x = float(items[1])
+        y = float(items[2])
+        input_points.append(Point(name, x, y))
 
 # find which points are outside MBR
-
+inside_mbr = []
+outside_mbr = []
+for point in input_points:
+    if p.mbr_check_if_inside(point) is True:
+        inside_mbr.append(point)
+    else:
+        outside_mbr.append(point)
 
 # classify points
+on_boundary = []
+to_be_classified = []
+for point in inside_mbr:
+    if p.boundary(point) == 'boundary':
+        on_boundary.append(point)
+    else:
+        to_be_classified.append(point)
 
+inside_polygon = []
+outside_polygon = []
+for point in to_be_classified:
+    if p.contains(point) is True:
+        inside_polygon.append(point)
+    else:
+        outside_polygon.append(point)
 
 # combine results into one sorted list to be written into the file
 
