@@ -49,12 +49,12 @@ class Point:
 
 class Polygon:
     def __init__(self, points):
-        #points: a list of Points in clockwise order.
+#points: a list of Points in clockwise order.
         self.points = points
 
     @property
     def edges(self):
-        #Returns a list of tuples that each contain 2 points of an edge
+#Returns a list of tuples that each contain 2 points of an edge
         edge_list = []
         for i, p in enumerate(self.points):
             p1 = p
@@ -125,36 +125,25 @@ class Polygon:
             if a.y > b.y:
                 a, b = b, a
 
-            crossproduct = (point.y - a.y) * (b.x - a.x) - (point.x - a.x) * (b.y - a.y)
+            distance_a_b = ((a.x - b.x) ** 2 + (a.y - b.y) ** 2)**(1/2)
+            distance_a_point = ((a.x - point.x) ** 2 + (a.y - point.y) ** 2)**(1/2)
+            distance_b_point = ((point.x - b.x) ** 2 + (point.y - b.y) ** 2)**(1/2)
 
-            # compare versus epsilon for floating point values, or != 0 if using integers
-            if abs(crossproduct) > _eps:
-                continue
-
-            dotproduct = (point.x - a.x) * (b.x - a.x) + (point.y - a.y) * (b.y - a.y)
-            if dotproduct < 0:
-                continue
-
-            squaredlengthba = (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y)
-            if dotproduct > squaredlengthba:
-                continue
-
-            location = 'boundary'
+            if distance_a_point + distance_b_point == distance_a_b:
+                location = 'boundary'
         return location
+
 
 # Read a list of x, y coordinates from a comma-separated values (CSV) file
 polygon_points = []
-with open('/Users/ak/Desktop/assignment_1/polygon_no_id.csv', 'r') as f:
-#    print(f.readline())
-    for line in f.readlines():
+with open('polygon.csv', 'r') as f:
+    for line in (f.readlines()[1:]):
         items = line.split(',')
         name = str(items[0])
         x = float(items[1])
         y = float(items[2])
         polygon_points.append(Point(name, x, y))
-
 p = Polygon(polygon_points)
-n_points = len(polygon_points)
 
 xs = []
 ys = []
@@ -176,8 +165,8 @@ mbr_y = [min_y, max_y, max_y, min_y, min_y]
 
 # make a list of coordinates for testing from csv
 input_points = []
-with open('/Users/ak/Desktop/assignment_1/input_no_id.csv', 'r') as f:
-    for line in f.readlines():
+with open('input.csv', 'r') as d:
+    for line in d.readlines()[1:]:
         items = line.split(',')
         name = str(items[0])
         x = float(items[1])
@@ -212,8 +201,18 @@ for point in to_be_classified:
 
 # combine results into one sorted list to be written into the file
 
-
 # write into file
 
-
 # plot
+plotter = Plotter()
+plotter.add_polygon(xs, ys)
+plotter.add_polygon(mbr_x, mbr_y)
+for point in outside_mbr:
+    plotter.red_point(point.x, point.y)
+for point in outside_polygon:
+    plotter.red_point(point.x, point.y)
+for point in inside_polygon:
+    plotter.green_point(point.x, point.y)
+for point in on_boundary:
+    plotter.blue_point(point.x, point.y)
+plotter.show()
