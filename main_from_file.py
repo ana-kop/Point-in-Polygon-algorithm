@@ -200,8 +200,28 @@ for point in to_be_classified:
         outside_polygon.append(point)
 
 # combine results into one sorted list to be written into the file
+results = []
+for point in outside_mbr:
+    r = [int(point.name), ',outside']
+    results.append(r)
+for point in outside_polygon:
+    r = [int(point.name), ',outside']
+    results.append(r)
+for point in on_boundary:
+    r = [int(point.name), ',boundary']
+    results.append(r)
+for point in inside_polygon:
+    r = [int(point.name), ',inside']
+    results.append(r)
+results.sort(key=lambda x: x[0])
 
 # write into file
+output_file = open('output.csv', 'w+')
+output_file.write('id,category')
+for point in results:
+    output_file.write('\n')
+    output_file.write(str(point[0]) + point[1])  # is it okay for id to be string in the output?
+output_file.close()
 
 # plot
 plotter = Plotter()
