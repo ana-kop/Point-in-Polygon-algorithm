@@ -176,27 +176,26 @@ user_decision = input('Would you like to check location of a point? Please enter
 
 while user_decision == 'yes':
     # get the point from user
-    x = float(input('Please enter x-coordinate of your point: '))
-    y = float(input('Please enter y-coordinate of your point: '))
+    x = float(input('Please enter the X-coordinate of your point: '))
+    # if type error
+    y = float(input('Please enter the Y-coordinate of your point: '))
+    # if type error
     point_name = str(input('Please name your point: '))
+    # if type error
     input_point = Point(point_name, x, y)
 
     # find whether point is inside MBR
     result = p.check_point(input_point)
     print('Your point is on the ' + result + ' of the polygon.')
-    user_decision = input('Would you like to check another point? Please enter "yes" or "no": ')
 
-# plot
-# plotter = Plotter()
-# plotter.add_polygon(xs, ys)
-# plotter.add_polygon(mbr_x, mbr_y)
-# for point in outside_mbr:
-#     plotter.red_point(point.x, point.y)
-# for point in outside_polygon:
-#     plotter.red_point(point.x, point.y)
-# for point in inside_polygon:
-#     plotter.green_point(point.x, point.y)
-# for point in on_boundary:
-#     plotter.blue_point(point.x, point.y)
-# plotter.show()
+    # plot
+    plotter = Plotter()
+    plotter.add_polygon(xs, ys)
+    plotter.add_point(x, y, result)
+    plotter.show()
 
+    user_decision = input('Would you like to check location of another point? Please enter yes or no: ')
+
+# error handling in input
+if user_decision != 'yes' and user_decision != 'no':
+    user_decision = input('Your answer is not recognised. Would you like to check location of a point? Please enter yes or no:  ')
