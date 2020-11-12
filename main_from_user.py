@@ -11,7 +11,10 @@ class Plotter:
         plt.figure()
 
     def add_polygon(self, xs, ys):
-        plt.plot(xs, ys, 'lightgray', label='Polygon')
+        plt.plot(xs, ys, 'black', label='Polygon',  lw=0.7)
+
+    def add_mbr(self, xs, ys):
+        plt.plot(xs, ys, 'darkgray', label='MBR', linestyle='--')
 
     def add_point(self, x, y, kind=None):
         if kind == "outside":
@@ -40,8 +43,7 @@ class Plotter:
 
 
 class Point:
-    def __init__(self, name, x, y):
-        self.name = name
+    def __init__(self, x, y):
         self.x = x
         self.y = y
 
@@ -148,10 +150,9 @@ polygon_points = []
 with open('polygon.csv', 'r') as f:
     for line in (f.readlines()[1:]):
         items = line.split(',')
-        name = str(items[0])
         x = float(items[1])
         y = float(items[2])
-        polygon_points.append(Point(name, x, y))
+        polygon_points.append(Point(x, y))
 p = Polygon(polygon_points)
 
 xs = []
@@ -180,9 +181,7 @@ while user_decision == 'yes':
     # if type error
     y = float(input('Please enter the Y-coordinate of your point: '))
     # if type error
-    point_name = str(input('Please name your point: '))
-    # if type error
-    input_point = Point(point_name, x, y)
+    input_point = Point(x, y)
 
     # find whether point is inside MBR
     result = p.check_point(input_point)
@@ -198,4 +197,5 @@ while user_decision == 'yes':
 
 # error handling in input
 if user_decision != 'yes' and user_decision != 'no':
-    user_decision = input('Your answer is not recognised. Would you like to check location of a point? Please enter yes or no:  ')
+    user_decision = input('Your answer is not recognised. Would you like to check location of a point? Please enter '
+                          'yes or no:  ')
