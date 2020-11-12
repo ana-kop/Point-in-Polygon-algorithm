@@ -34,8 +34,10 @@ class Plotter:
         plt.show()
 
 
+# Point class has 3 attributes: point id, x-coordinate, y-coordinate
 class Point:
     def __init__(self, name, x, y):
+        # Attributes can be displayed using respective methods
         self.name = name
         self.x = x
         self.y = y
@@ -43,7 +45,7 @@ class Point:
 
 class Polygon:
     def __init__(self, points):
-        # points: a list of Points in clockwise order.
+        # points: a list of Point class object, in clockwise order
         self.points = points
 
     @property
@@ -54,8 +56,30 @@ class Polygon:
             p1 = p
             p2 = self.points[(i + 1) % len(self.points)]
             edge_list.append((p1, p2))
-
         return edge_list
+
+    def vertex_xs(self):
+        xs = []
+        for point in self.points:
+            xs.append(point.x)
+        return xs
+
+    def vertex_ys(self):
+        ys = []
+        for point in self.points:
+            ys.append(point.y)
+        return ys
+
+    # def mbr(self):
+    #     # Find coordinates for MBR
+    #     min_x = min(self.points_xs)
+    #     max_x = max(self.points_xs)
+    #     min_y = min(self.points_ys)
+    #     max_y = max(self.points_ys)
+    #
+    #     # make a list of 4 points so that we can make a polygon
+    #     mbr_points = [[min_x, min_y], [min_x, max_y], [max_x, max_y], [max_x, min_y], [min_x, min_y]]
+    #     return mbr_points
 
     def mbr_check_if_inside(self, point):
         res = False
@@ -89,11 +113,13 @@ class Polygon:
                 inside = not inside
                 continue
 
+            # find slope of the edge
             try:
                 m_edge = (b.y - a.y) / (b.x - a.x)
             except ZeroDivisionError:
                 m_edge = _huge
 
+            # find slope of the line segment between POI and A
             try:
                 m_point = (point.y - a.y) / (point.x - a.x)
             except ZeroDivisionError:
@@ -142,25 +168,19 @@ def read_points_from_file(path, mode, list_for_points):
 # Read a list of x, y coordinates from a comma-separated values (CSV) file
 polygon_points = []
 read_points_from_file('polygon.csv', 'r', polygon_points)
-p = Polygon(polygon_points)
-
-xs = []
-ys = []
-for point in polygon_points:
-    xs.append(point.x)
-for point in polygon_points:
-    ys.append(point.y)
+polygon = Polygon(polygon_points)
 
 # Find coordinates for MBR
+xs = polygon.vertex_xs()
+ys = polygon.vertex_ys()
 min_x = min(xs)
 max_x = max(xs)
 min_y = min(ys)
 max_y = max(ys)
 
-# make a list of 4 points so that we can make a polygon
-mbr_points = [[min_x, min_y], [min_x, max_y], [max_x, max_y], [max_x, min_y], [min_x, min_y]]
-mbr_x = [min_x, min_x, max_x, max_x, min_x]
-mbr_y = [min_y, max_y, max_y, min_y, min_y]
+# # make a list of 4 points so that we can make a polygon
+# mbr_x = [min_x, min_x, max_x, max_x, min_x]
+# mbr_y = [min_y, max_y, max_y, min_y, min_y]
 
 # make a list of coordinates for testing from csv
 input_points = []
@@ -173,22 +193,21 @@ for point in input_points:
 # find which points are outside MBR
 inside_mbr = []
 for point in input_points:
-    if p.mbr_check_if_inside(point) is True:
+    if polygon.mbr_check_if_inside(point) is True:
         inside_mbr.append(point)
     else:
         points_dictionary[point.name][2] = 'outside'
-print(points_dictionary)
 
 # classify points
 to_be_classified = []
 for point in inside_mbr:
-    if p.boundary(point) == 'boundary':
+    if polygon.boundary(point) == 'boundary':
         points_dictionary[point.name][2] = 'boundary'
     else:
         to_be_classified.append(point)
 
 for point in to_be_classified:
-    if p.contains(point) is True:
+    if polygon.contains(point) is True:
         points_dictionary[point.name][2] = 'inside'
     else:
         points_dictionary[point.name][2] = 'outside'
@@ -198,13 +217,13 @@ output_file = open('output.csv', 'w+')
 output_file.write('id,category')
 for key, values in points_dictionary.items():
     output_file.write('\n')
-    output_file.write(key + ',' + values[2])  # is it okay for id to be string in the output?
+    output_file.write(key + ',' + values[2])
 output_file.close()
 
 # plot
 plotter = Plotter()
-plotter.add_polygon(xs, ys)
-plotter.add_mbr(mbr_x, mbr_y)
+plotter.add_polygon(polygon.vertex_xs(), polygon.vertex_ys())
+# plotter.add_mbr(mbr_x, mbr_y)
 for key, values in points_dictionary.items():
     plotter.add_point(values[0], values[1], values[2])
 plotter.show()
