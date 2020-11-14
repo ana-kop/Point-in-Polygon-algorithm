@@ -8,7 +8,7 @@ import sys
 matplotlib.use('TkAgg')
 
 
-# Define the Plotter class that will plot the polygon, the MBR and the points
+# Definition of the Plotter class that will plot the polygon, the MBR and the points
 class Plotter:
 
     def __init__(self):
@@ -30,6 +30,12 @@ class Plotter:
         else:
             plt.plot(x, y, "ko", label='Unclassified')
 
+    def add_ray(self, x, y):
+        x2 = max_x + 4
+        xs = [x, x2]
+        ys = [y, y]
+        plt.plot(xs, ys, 'black', label='Ray', lw=0.5, linestyle='--')
+
     def show(self):
         handles, labels = plt.gca().get_legend_handles_labels()
         by_label = OrderedDict(zip(labels, handles))
@@ -37,8 +43,10 @@ class Plotter:
         plt.show()
 
 
-# Definition of the Point class which has 3 attributes: point id, x-coordinate, y-coordinate
+# Definition of the Point class
 class Point:
+
+    # Point class has 3 required arguments: point id, x-coordinate, y-coordinate
     def __init__(self, name, x, y):
         # Attributes can be displayed using their respective methods
         self.name = name
@@ -46,10 +54,11 @@ class Point:
         self.y = y
 
 
-# Definition of the Polygon class which has 1 attribute: list of points
+# Definition of the Polygon class
 class Polygon:
+
+    # Polygon class has 1 required argument: list of points, in clockwise order
     def __init__(self, points):
-        # Where 'points' is a list of point objects, in clockwise order
         self.points = points
 
     @property
@@ -57,38 +66,28 @@ class Polygon:
     def edges(self):
         edge_list = []
 
-        # For every point in the list of polygon points, take this point and the next point on the list, and
+        # For every point on the list of polygon points, take this point and the next point on the list, and
         # make a tuple containing the coordinates of both of these points
         for i, p in enumerate(self.points):
             p1 = p
             p2 = self.points[(i + 1) % len(self.points)]
-
             # Append the tuple with 2 points to the list edge_list
             edge_list.append((p1, p2))
         return edge_list
 
+    # The vertex_xs() method returns a list of x-coordinates of the polygon points, to be used for plotting
     def vertex_xs(self):
         xs = []
         for point in self.points:
             xs.append(point.x)
         return xs
 
+    # The vertex_ys() method returns a list of y-coordinates of the polygon points, to be used for plotting
     def vertex_ys(self):
         ys = []
         for point in self.points:
             ys.append(point.y)
         return ys
-
-    # def mbr(self):
-    #     # Find coordinates for MBR
-    #     min_x = min(self.points_xs)
-    #     max_x = max(self.points_xs)
-    #     min_y = min(self.points_ys)
-    #     max_y = max(self.points_ys)
-    #
-    #     # make a list of 4 points so that we can make a polygon
-    #     mbr_points = [[min_x, min_y], [min_x, max_y], [max_x, max_y], [max_x, min_y], [min_x, min_y]]
-    #     return mbr_points
 
     # The mbr_check_if_inside() method takes a point object and returns True if the point inside the MBR
     def mbr_check_if_inside(self, point):
@@ -165,24 +164,29 @@ class Polygon:
 
     # The boundary() method takes a point-of-interest (POI), and checks if the POI lies on the polygon boundary
     def boundary(self, point):
-        _eps = 0.00001
         on_boundary = False
         for edge in self.edges:
             # name the 2 end points of the edge A and B
             a, b = edge[0], edge[1]
             # make sure A is lower than B
-            if a.y > b.y:
-                a, b = b, a
+            # if a.y > b.y:
+            #     a, b = b, a
 
             # Calculate the distance between A and B, between A and POI, and between B and POI
             # using the formula 'distance = ((x1 - x2)**2 + (y1 - y2)**2) ** 1/2
             distance_a_b = ((a.x - b.x) ** 2 + (a.y - b.y) ** 2) ** (1 / 2)
             distance_a_point = ((a.x - point.x) ** 2 + (a.y - point.y) ** 2) ** (1 / 2)
             distance_b_point = ((point.x - b.x) ** 2 + (point.y - b.y) ** 2) ** (1 / 2)
+            sum_point_dist = distance_a_point + distance_b_point
+
+            # Both numbers are rounded to 12 decimal places before comparison, since Python sometimes rounds
+            # square roots to different number of decimal places
+            distance_a_b = round(distance_a_b, 12)
+            sum_point_dist = round(sum_point_dist, 12)
 
             # If the sum of the distance between A and POI, and between B and POI is equal to the
             # distance between A and B, then the POI must lie on the edge, and the method returns True
-            if distance_a_point + distance_b_point == distance_a_b:
+            if sum_point_dist == distance_a_b:
                 on_boundary = True
         return on_boundary
 
@@ -202,7 +206,7 @@ def read_points_from_file(path, list_for_points):
 
 # Read a list of polygon coordinates from 'polygon.csv' file into polygon_points list
 polygon_points = []
-read_points_from_file('polygon.csv', polygon_points)
+read_points_from_file('polygon_x.csv', polygon_points)
 
 # Make a polygon object from the points obtained in the previous step
 polygon = Polygon(polygon_points)
@@ -221,7 +225,7 @@ mbr_y = [min_y, max_y, max_y, min_y, min_y]
 
 # Read a list of points for testing from 'input.csv' file into input_points list
 input_points = []
-read_points_from_file('input.csv', input_points)
+read_points_from_file('more_input.csv', input_points)
 
 # Make a dictionary of points for testing, where point name/id is key, and point coordinates and location are values
 points_dictionary = {}
