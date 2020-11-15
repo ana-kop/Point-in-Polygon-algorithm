@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 # Import sys module for the RCA algorithm in the Polygon class
 import sys
 
-matplotlib.use('TkAgg')
+matplotlib.use("TkAgg")
 
 
 class Plotter:
@@ -14,27 +14,27 @@ class Plotter:
         plt.figure()
 
     def add_polygon(self, xs, ys):
-        plt.fill(xs, ys, 'lightgray', label='Polygon', lw=2, zorder=0)
+        plt.fill(xs, ys, "lightgray", label="Polygon", lw=2, zorder=0)
 
     # This method plots the MBR
     def add_mbr(self, xs, ys):
-        plt.plot(xs, ys, 'deepskyblue', label='MBR', linestyle='--', lw=1.4)
+        plt.plot(xs, ys, "deepskyblue", label="MBR", linestyle="--", lw=1.4)
 
     def add_point(self, x, y, kind=None):
         if kind == "outside":
-            plt.plot(x, y, "ro", label='Outside')
+            plt.plot(x, y, "ro", label="Outside")
         elif kind == "boundary":
-            plt.plot(x, y, "bo", label='Boundary')
+            plt.plot(x, y, "bo", label="Boundary")
         elif kind == "inside":
-            plt.plot(x, y, "go", label='Inside')
+            plt.plot(x, y, "go", label="Inside")
         else:
-            plt.plot(x, y, "ko", label='Unclassified')
+            plt.plot(x, y, "ko", label="Unclassified")
 
     def add_ray(self, x, y, max_x):
         """The add_ray() method plots a horizontal ray from the specified point."""
         x2 = 1.5 * max_x
-        plt.arrow(x, y, x2, 0, head_width=0.1, head_length=0.08, label='Ray', linewidth=0.4, linestyle=(0, (1, 10)),
-                  color='black', length_includes_head=True)
+        plt.arrow(x, y, x2, 0, head_width=0.1, head_length=0.08, label="Ray", linewidth=0.4, linestyle=(0, (1, 10)),
+                  color="black", length_includes_head=True)
 
     def show(self):
         handles, labels = plt.gca().get_legend_handles_labels()
@@ -55,7 +55,9 @@ class Point:
 
 
 class Polygon:
-    """Definition of the Polygon class. Polygon class has 1 required attribute: list of points, in clockwise order."""
+    """Definition of the Polygon class.
+    Polygon object class has 1 required attribute: list of points, in clockwise order.
+    """
     def __init__(self, points):
         self.points = points
 
@@ -73,21 +75,21 @@ class Polygon:
         return edge_list
 
     def x_vertices(self):
-        """The vertex_xs() method returns a list of x-coordinates of the polygon points"""
+        """The vertex_xs() method returns a list of x-coordinates of the polygon vertices"""
         xs = []
         for point in self.points:
             xs.append(point.x)
         return xs
 
     def y_vertices(self):
-        """The vertex_ys() method returns a list of x-coordinates of the polygon points"""
+        """The vertex_ys() method returns a list of x-coordinates of the polygon vertices"""
         ys = []
         for point in self.points:
             ys.append(point.y)
         return ys
 
     def mbr_contains(self, point, min_x, max_x, min_y, max_y):
-        """The mbr_contains() method takes a point object and the MBR vertices, and returns True
+        """The mbr_contains() method takes an instance of a point object and the MBR vertices, and returns True
         if the point is inside the MBR.
         """
 
@@ -117,14 +119,14 @@ class Polygon:
             if a.y > b.y:
                 a, b = b, a
 
-            # Make sure POI does not have the same y-coordinate as on of the edge points
+            # Make sure POI does not have the same y-coordinate as one of the edge points
             if point.y == a.y or point.y == b.y:
                 # If POI has the same y-coordinate as A or B, increase the y-coordinate of POI by a small number
                 point.y += _eps
 
             # If the x or y-coordinate of POI is greater or smaller than ???
             # then the horizontal ray does not intersect with the edge
-            if point.y > b.y or point.y < a.y or point.x > max(a.x, b.x):
+            if point.y > b.y or point.y < a.y or point.x >= max(a.x, b.x):
                 continue
 
             # If the x-coordinate of POI is smaller than the x-coordinate of both A and B,
@@ -137,7 +139,7 @@ class Polygon:
             try:
                 slope_edge = (b.y - a.y) / (b.x - a.x)
 
-            # if the calculation produces a zero division error, then edge is vertical and its slope is infinity
+            # if the calculation produces a zero division error, then edge is vertical and its slope is set to infinity
             except ZeroDivisionError:
                 slope_edge = _huge
 
@@ -146,14 +148,9 @@ class Polygon:
                 slope_point = (point.y - a.y) / (point.x - a.x)
 
             # If the calculation produces a zero division error, then line between POI and A is vertical
-            # and its slope is infinity
+            # and its slope is set to infinity
             except ZeroDivisionError:
                 slope_point = _huge
-
-            # If the edge is downward-sloping and the x-coordinates of POI and A are equal, then
-            # the horizontal ray does not intersect with the edge
-            if slope_edge < 0 and a.x == point.x:
-                continue
 
             # The ray intersects with the edge if none of the conditions above have been fulfilled
             # and the slope of the line between POI and A is greater than or equal to slope of the edge
@@ -170,12 +167,9 @@ class Polygon:
         for edge in self.edges:
             # name the 2 end points of the edge A and B
             a, b = edge[0], edge[1]
-            # make sure A is lower than B
-            # if a.y > b.y:
-            #     a, b = b, a
 
             # Calculate the distance between A and B, between A and POI, and between B and POI
-            # using the formula 'distance = ((x1 - x2)**2 + (y1 - y2)**2) ** 1/2
+            # using the formula "distance = ((x1 - x2)**2 + (y1 - y2)**2) ** 1/2
             distance_a_b = ((a.x - b.x) ** 2 + (a.y - b.y) ** 2) ** (1 / 2)
             distance_a_point = ((a.x - point.x) ** 2 + (a.y - point.y) ** 2) ** (1 / 2)
             distance_b_point = ((point.x - b.x) ** 2 + (point.y - b.y) ** 2) ** (1 / 2)
@@ -194,11 +188,12 @@ class Polygon:
 
 
 def read_points_from_file(file_path, list_for_points):
-    """ The read_points_from_file() method takes a csv file and inputs the points from the file
-    into a specified list as Point class objects."""
-    with open(file_path, 'r') as f:
+    """ The read_points_from_file() function takes a csv file and inputs the points from the file
+    into a specified list as Point class instances.
+    """
+    with open(file_path, "r") as f:
         for line in (f.readlines()[1:]):
-            items = line.split(',')
+            items = line.split(",")
             name = str(items[0])
             x = float(items[1])
             y = float(items[2])
@@ -206,13 +201,13 @@ def read_points_from_file(file_path, list_for_points):
     return list_for_points
 
 
-def main(polygon_points_file, input_points_file, display_points=True, display_points_rays=True):
+def main(polygon_points_file, input_points_file, display_points=True, display_points_rays=False):
     print("Read " + str(polygon_points_file))
-    # Read a list of polygon coordinates from 'polygon.csv' file into polygon_points list
+    # Read a list of polygon coordinates from "polygon.csv" file into polygon_points list
     polygon_points_list = []
     read_points_from_file(polygon_points_file, polygon_points_list)
 
-    # Make a polygon object from the points obtained in the previous step
+    # Make an instance of a Polygon from the points obtained in the previous step
     polygon = Polygon(polygon_points_list)
 
     # Find coordinates for MBR
@@ -227,7 +222,7 @@ def main(polygon_points_file, input_points_file, display_points=True, display_po
     mbr_x = [min_x, min_x, max_x, max_x, min_x]
     mbr_y = [min_y, max_y, max_y, min_y, min_y]
 
-    # Read a list of points for testing from 'input.csv' file into input_points list
+    # Read a list of points for testing from "input.csv" file into input_points list
     print("Read " + str(input_points_file))
     input_points_list = []
     read_points_from_file(input_points_file, input_points_list)
@@ -235,7 +230,7 @@ def main(polygon_points_file, input_points_file, display_points=True, display_po
     # Make a dictionary of points for testing, where point name/id is key, and point coordinates and location are values
     points_dictionary = {}
     for point in input_points_list:
-        points_dictionary.update({point.name: [point.x, point.y, 'unclassified']})
+        points_dictionary.update({point.name: [point.x, point.y, "unclassified"]})
 
     print("Categorize points")
     # Find which input points are inside MBR and append them to a list of points for further testing
@@ -244,32 +239,32 @@ def main(polygon_points_file, input_points_file, display_points=True, display_po
         if polygon.mbr_contains(point, min_x, max_x, min_y, max_y) is True:
             points_inside_mbr.append(point)
         else:
-            points_dictionary[point.name][2] = 'outside'
+            points_dictionary[point.name][2] = "outside"
 
     # Find which points are on the polygon boundary and append the other points to a list of points for further testing
     to_be_classified = []
     for point in points_inside_mbr:
         if polygon.boundary(point) is True:
-            points_dictionary[point.name][2] = 'boundary'
+            points_dictionary[point.name][2] = "boundary"
         else:
             to_be_classified.append(point)
 
     # Classify points that are inside the MBR and not on the boundary
     for point in to_be_classified:
         if polygon.contains(point) is True:
-            points_dictionary[point.name][2] = 'inside'
+            points_dictionary[point.name][2] = "inside"
         else:
-            points_dictionary[point.name][2] = 'outside'
+            points_dictionary[point.name][2] = "outside"
 
-    # For each input point, write point name with the result of its classification into a file 'output.csv'
+    # For each input point, write point name with the result of its classification into a file "output.csv"
     print("Write output.csv")
-    output_file = open('output.csv', 'w+')
-    output_file.write('id,category')
+    output_file = open("output.csv", "w+")
+    output_file.write("id,category")
 
     # For each input point in the dictionary, write point name/id with the result of its classification into output file
     for key, values in points_dictionary.items():
-        output_file.write('\n')
-        output_file.write(key + ',' + values[2])
+        output_file.write("\n")
+        output_file.write(key + "," + values[2])
     output_file.close()
 
     # Plot the results of classification alongside the original polygon
@@ -287,8 +282,8 @@ def main(polygon_points_file, input_points_file, display_points=True, display_po
     return None
 
 
-# If whole file is ran
+# If whole file is executed:
 if __name__ == "__main__":
-    polygon_file = 'polygon.csv'
-    input_file = 'input.csv'
+    polygon_file = "polygon.csv"
+    input_file = "input.csv"
     main(polygon_file, input_file)
