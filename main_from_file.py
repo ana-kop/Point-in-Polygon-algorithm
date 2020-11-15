@@ -63,7 +63,6 @@ class Polygon:
     def edges(self):
         """The edges() method returns a list of tuples, where each tuple contains 2 endpoints of a polygon edge"""
         edge_list = []
-
         # For every point on the list of polygon points, take this point and the next point on the list, and
         # make a tuple containing the coordinates of both of these points
         for i, p in enumerate(self.points):
@@ -91,6 +90,7 @@ class Polygon:
         """The mbr_contains() method takes a point object and the MBR vertices, and returns True
         if the point is inside the MBR.
         """
+
         is_inside_mbr = False
         # check if the x-coordinate of the point is between the minimum and maximum x-coordinates of the polygon,
         # and the y-coordinate of the point is between the minimum and maximum y-coordinates of the polygon
@@ -99,13 +99,12 @@ class Polygon:
         return is_inside_mbr
 
     def contains(self, point):
-        #The polygon_contains() method takes a point-of-interest (POI), implements the RCA and returns True if
-        #POI is inside the polygon
-
+        """The polygon_contains() method takes a point-of-interest (POI), implements the RCA and returns True if
+        the POI is inside the polygon
+        """
 
         # _huge acts as infinity if there is division by 0
         _huge = sys.float_info.max
-
         # _eps is used in cases where POI has the same y-coordinate as A or B
         _eps = 0.00001
 
@@ -116,51 +115,51 @@ class Polygon:
             a, b = edge[0], edge[1]
             # make sure A is lower than B
             if a.y > b.y:
-               a, b = b, a
+                a, b = b, a
 
             # Make sure POI does not have the same y-coordinate as on of the edge points
             if point.y == a.y or point.y == b.y:
-               # If POI has the same y-coordinate as A or B, increase the y-coordinate of POI by a small number
-               point.y += _eps
+                # If POI has the same y-coordinate as A or B, increase the y-coordinate of POI by a small number
+                point.y += _eps
 
             # If the x or y-coordinate of POI is greater or smaller than ???
             # then the horizontal ray does not intersect with the edge
             if point.y > b.y or point.y < a.y or point.x > max(a.x, b.x):
-               continue
+                continue
 
             # If the x-coordinate of POI is smaller than the x-coordinate of both A and B,
             # then the horizontal ray intersects with the edge
             if point.x < min(a.x, b.x):
-               is_inside_polygon = not is_inside_polygon
-               continue
+                is_inside_polygon = not is_inside_polygon
+                continue
 
             # Find slope of the edge
             try:
-               slope_edge = (b.y - a.y) / (b.x - a.x)
+                slope_edge = (b.y - a.y) / (b.x - a.x)
 
             # if the calculation produces a zero division error, then edge is vertical and its slope is infinity
             except ZeroDivisionError:
-               slope_edge = _huge
+                slope_edge = _huge
 
             # Find slope of the line segment between POI and A
             try:
-               slope_point = (point.y - a.y) / (point.x - a.x)
+                slope_point = (point.y - a.y) / (point.x - a.x)
 
             # If the calculation produces a zero division error, then line between POI and A is vertical
             # and its slope is infinity
             except ZeroDivisionError:
-               slope_point = _huge
+                slope_point = _huge
 
             # If the edge is downward-sloping and the x-coordinates of POI and A are equal, then
             # the horizontal ray does not intersect with the edge
             if slope_edge < 0 and a.x == point.x:
-               continue
+                continue
 
             # The ray intersects with the edge if none of the conditions above have been fulfilled
             # and the slope of the line between POI and A is greater than or equal to slope of the edge
             if slope_point >= slope_edge:
-               is_inside_polygon = not is_inside_polygon
-               continue
+                is_inside_polygon = not is_inside_polygon
+                continue
 
         return is_inside_polygon
 
@@ -195,8 +194,8 @@ class Polygon:
 
 
 def read_points_from_file(file_path, list_for_points):
-    # """ The read_points_from_file() method takes a csv file and inputs the points from the file
-    # into a specified list as Point class objects """
+    """ The read_points_from_file() method takes a csv file and inputs the points from the file
+    into a specified list as Point class objects."""
     with open(file_path, 'r') as f:
         for line in (f.readlines()[1:]):
             items = line.split(',')
@@ -236,31 +235,31 @@ def main(polygon_points_file, input_points_file, display_points=True, display_po
     # Make a dictionary of points for testing, where point name/id is key, and point coordinates and location are values
     points_dictionary = {}
     for point in input_points_list:
-       points_dictionary.update({point.name: [point.x, point.y, 'unclassified']})
+        points_dictionary.update({point.name: [point.x, point.y, 'unclassified']})
 
     print("Categorize points")
     # Find which input points are inside MBR and append them to a list of points for further testing
     points_inside_mbr = []
     for point in input_points_list:
-       if polygon.mbr_contains(point, min_x, max_x, min_y, max_y) is True:
-           points_inside_mbr.append(point)
-       else:
-           points_dictionary[point.name][2] = 'outside'
+        if polygon.mbr_contains(point, min_x, max_x, min_y, max_y) is True:
+            points_inside_mbr.append(point)
+        else:
+            points_dictionary[point.name][2] = 'outside'
 
     # Find which points are on the polygon boundary and append the other points to a list of points for further testing
     to_be_classified = []
     for point in points_inside_mbr:
-       if polygon.boundary(point) is True:
-           points_dictionary[point.name][2] = 'boundary'
-       else:
-           to_be_classified.append(point)
+        if polygon.boundary(point) is True:
+            points_dictionary[point.name][2] = 'boundary'
+        else:
+            to_be_classified.append(point)
 
     # Classify points that are inside the MBR and not on the boundary
     for point in to_be_classified:
-       if polygon.contains(point) is True:
-           points_dictionary[point.name][2] = 'inside'
-       else:
-           points_dictionary[point.name][2] = 'outside'
+        if polygon.contains(point) is True:
+            points_dictionary[point.name][2] = 'inside'
+        else:
+            points_dictionary[point.name][2] = 'outside'
 
     # For each input point, write point name with the result of its classification into a file 'output.csv'
     print("Write output.csv")
@@ -269,8 +268,8 @@ def main(polygon_points_file, input_points_file, display_points=True, display_po
 
     # For each input point in the dictionary, write point name/id with the result of its classification into output file
     for key, values in points_dictionary.items():
-       output_file.write('\n')
-       output_file.write(key + ',' + values[2])
+        output_file.write('\n')
+        output_file.write(key + ',' + values[2])
     output_file.close()
 
     # Plot the results of classification alongside the original polygon
@@ -280,10 +279,10 @@ def main(polygon_points_file, input_points_file, display_points=True, display_po
         plotter.add_polygon(polygon.x_vertices(), polygon.y_vertices())
         plotter.add_mbr(mbr_x, mbr_y)
         for key, values in points_dictionary.items():
-           plotter.add_point(values[0], values[1], values[2])
+            plotter.add_point(values[0], values[1], values[2])
         if display_points_rays is True:
-           for key, values in points_dictionary.items():
-               plotter.add_ray(values[0], values[1], max_x)
+            for key, values in points_dictionary.items():
+                plotter.add_ray(values[0], values[1], max_x)
         plotter.show()
     return None
 
