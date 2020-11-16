@@ -32,9 +32,9 @@ class Plotter:
 
     def add_ray(self, x, y, max_x):
         """The add_ray() method plots a horizontal ray from the specified point."""
-        x2 = 1.5 * max_x
-        plt.arrow(x, y, x2, 0, head_width=0.1, head_length=0.08, label="Ray", linewidth=0.4, linestyle=(0, (1, 10)),
-                  color="black", length_includes_head=True)
+        xs = [x, max_x + 1]
+        ys = [y, y]
+        plt.plot(xs, ys, label="Ray", linewidth=0.4,  color="black")
 
     def show(self):
         handles, labels = plt.gca().get_legend_handles_labels()
@@ -216,7 +216,7 @@ def main(polygon_points_file):
                     check_result = "inside"
         return check_result
 
-    print("Read " + str(polygon_points_file))
+    print("--Read " + str(polygon_points_file))
     # Read a list of polygon coordinates from "polygon.csv" file into polygon_points list
     polygon_points_list = []
     read_points_from_file(polygon_points_file, polygon_points_list)
@@ -236,7 +236,7 @@ def main(polygon_points_file):
     mbr_x = [min_x, min_x, max_x, max_x, min_x]
     mbr_y = [min_y, max_y, max_y, min_y, min_y]
 
-    print("Insert point information")
+    print("--Insert point information")
     user_decision = input("Would you like to check location of a point? Please enter yes or no: ")
 
     while user_decision == "yes":
@@ -256,13 +256,13 @@ def main(polygon_points_file):
         # Make a point Instance
         input_point = Point(x, y)
 
-        print("Categorize point")
+        print("--Categorize point")
         # Check the location of the point and record it in result
         result = check_point(polygon, input_point)
         print("Your point is on the " + result + " of the polygon.")
 
         # Plot the results of classification alongside the original polygon
-        print("Plot polygon and points")
+        print("--Plot polygon and points")
         print("IMPORTANT: Please close the plot window to continue")
         plotter = Plotter()
         plotter.add_polygon(polygon.x_vertices(), polygon.y_vertices())

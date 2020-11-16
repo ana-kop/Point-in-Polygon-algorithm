@@ -30,11 +30,12 @@ class Plotter:
         else:
             plt.plot(x, y, "ko", label="Unclassified")
 
-    def add_ray(self, x, y, max_x):
+    # This method plots the ray from a point of interest
+    def add_ray(self, x, y, max_x_input):
         """The add_ray() method plots a horizontal ray from the specified point."""
-        x2 = 1.5 * max_x
-        plt.arrow(x, y, x2, 0, head_width=0.1, head_length=0.08, label="Ray", linewidth=0.4, linestyle=(0, (1, 10)),
-                  color="black", length_includes_head=True)
+        xs = [x, max_x_input + 1]
+        ys = [y, y]
+        plt.plot(xs, ys, label="Ray", linewidth=0.4,  color="black")
 
     def show(self):
         handles, labels = plt.gca().get_legend_handles_labels()
@@ -124,8 +125,9 @@ class Polygon:
                 # If POI has the same y-coordinate as A or B, increase the y-coordinate of POI by a small number
                 point.y += _eps
 
-            # If the x or y-coordinate of POI is greater or smaller than ???
-            # then the horizontal ray does not intersect with the edge
+            # If the x-coordinate of POI is greater than x-coordinate of both A and B, or if then the horizontal ray
+            # does not intersect with the edge; same goes for if the y-coordinate of POI is greater than y-coordinate
+            # of B or smaller than y-coordinate of A
             if point.y > b.y or point.y < a.y or point.x >= max(a.x, b.x):
                 continue
 
@@ -201,7 +203,7 @@ def read_points_from_file(file_path, list_for_points):
     return list_for_points
 
 
-def main(polygon_points_file, input_points_file, display_points=True, display_points_rays=False):
+def main(polygon_points_file, input_points_file, display_result=True, display_result_with_rays=False):
     print("Read " + str(polygon_points_file))
     # Read a list of polygon coordinates from "polygon.csv" file into polygon_points list
     polygon_points_list = []
@@ -226,6 +228,12 @@ def main(polygon_points_file, input_points_file, display_points=True, display_po
     print("Read " + str(input_points_file))
     input_points_list = []
     read_points_from_file(input_points_file, input_points_list)
+
+    # Find the maximum x-coordinate from all the input points for drawing the rays
+    x_inputs =[]
+    for point in input_points_list:
+        x_inputs.append(point.x)
+    max_x_input = max(x_inputs)
 
     # Make a dictionary of points for testing, where point name/id is key, and point coordinates and location are values
     points_dictionary = {}
@@ -268,16 +276,16 @@ def main(polygon_points_file, input_points_file, display_points=True, display_po
     output_file.close()
 
     # Plot the results of classification alongside the original polygon
-    if display_points is True:
+    if display_result is True:
         print("Plot polygon and points")
         plotter = Plotter()
         plotter.add_polygon(polygon.x_vertices(), polygon.y_vertices())
         plotter.add_mbr(mbr_x, mbr_y)
         for key, values in points_dictionary.items():
             plotter.add_point(values[0], values[1], values[2])
-        if display_points_rays is True:
+        if display_result_with_rays is True:
             for key, values in points_dictionary.items():
-                plotter.add_ray(values[0], values[1], max_x)
+                plotter.add_ray(values[0], values[1], max_x_input)
         plotter.show()
     return None
 
@@ -286,4 +294,4 @@ def main(polygon_points_file, input_points_file, display_points=True, display_po
 if __name__ == "__main__":
     polygon_file = "polygon.csv"
     input_file = "input.csv"
-    main(polygon_file, input_file)
+    main(polygon_file, input_file, display_result=True, display_result_with_rays=True)
