@@ -103,7 +103,10 @@ class Polygon:
 
     def contains(self, point):
         """The polygon_contains() method takes a point-of-interest (POI), implements the RCA and returns True if
-        the POI is inside the polygon
+        the POI is inside the polygon.
+        References:
+        - Lemons, Phillip, Ray casting algorithm: http://philliplemons.com/posts/ray-casting-algorithm;
+        - Rosettacode.org, Ray casting algorithm, Python: https://rosettacode.org/wiki/Ray-casting_algorithm.
         """
 
         # _huge acts as infinity if there is division by 0
@@ -163,7 +166,10 @@ class Polygon:
         return is_inside_polygon
 
     def boundary(self, point):
-        """The boundary() method takes a point-of-interest (POI), and checks if the POI lies on the polygon boundary."""
+        """The boundary() method takes a point-of-interest (POI), and checks if the POI lies on the polygon boundary.
+        Reference: Stackoverflow, answer by Jules on 29/11/2008, Determining if a point is between two other points
+        on a line segment: shorturl.at/drBJT
+        """
 
         on_boundary = False
         for edge in self.edges:
@@ -230,7 +236,7 @@ def main(polygon_points_file, input_points_file, display_result=True, display_re
     read_points_from_file(input_points_file, input_points_list)
 
     # Find the maximum x-coordinate from all the input points for drawing the rays
-    x_inputs =[]
+    x_inputs = []
     for point in input_points_list:
         x_inputs.append(point.x)
     max_x_input = max(x_inputs)
@@ -290,8 +296,8 @@ def main(polygon_points_file, input_points_file, display_result=True, display_re
     return None
 
 
-# If whole file is executed:
+# If the whole file is executed:
 if __name__ == "__main__":
     polygon_file = "polygon.csv"
     input_file = "input.csv"
-    main(polygon_file, input_file, display_result=True, display_result_with_rays=True)
+    main(polygon_file, input_file, display_result=True, display_result_with_rays=False)

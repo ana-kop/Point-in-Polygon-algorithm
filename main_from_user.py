@@ -101,7 +101,10 @@ class Polygon:
 
     def contains(self, point):
         """The polygon_contains() method takes a point-of-interest (POI), implements the RCA and returns True if
-        the POI is inside the polygon
+        the POI is inside the polygon.
+        References:
+        - Lemons, Phillip, Ray casting algorithm: http://philliplemons.com/posts/ray-casting-algorithm;
+        - Rosettacode.org, Ray casting algorithm, Python: https://rosettacode.org/wiki/Ray-casting_algorithm.
         """
 
         # _huge acts as infinity if there is division by 0
@@ -160,8 +163,10 @@ class Polygon:
         return is_inside_polygon
 
     def boundary(self, point):
-        """The boundary() method takes a point-of-interest (POI), and checks if the POI lies on the polygon boundary."""
-
+        """The boundary() method takes a point-of-interest (POI), and checks if the POI lies on the polygon boundary.
+        Reference: Stackoverflow, answer by Jules on 29/11/2008, Determining if a point is between two other points
+        on a line segment: shorturl.at/drBJT
+        """
         on_boundary = False
         for edge in self.edges:
             # name the 2 end points of the edge A and B
@@ -237,23 +242,25 @@ def main(polygon_points_file):
     mbr_y = [min_y, max_y, max_y, min_y, min_y]
 
     print("--Insert point information")
+
     user_decision = input("Would you like to check location of a point? Please enter yes or no: ")
 
     while user_decision == "yes":
         # Get the point from user by asking for x- and y-coordinates
+
         try:
             x = float(input("Please enter the X-coordinate of your point: "))
-        # If user entered not a number and there is ValueError
+        # If user entered not a number and there is ValueError, then:
         except ValueError:
             x = float(input("Please input a NUMBER. Please enter the X-coordinate of your point: "))
 
         try:
             y = float(input("Please enter the Y-coordinate of your point: "))
-        # If user entered not a number and there is ValueError
+        # If user entered not a number and there is ValueError, then:
         except ValueError:
             y = float(input("Please input a NUMBER. Please enter the Y-coordinate of your point: "))
 
-        # Make a point Instance
+        # Make a point object from the inputs
         input_point = Point(x, y)
 
         print("--Categorize point")
@@ -271,15 +278,16 @@ def main(polygon_points_file):
         plotter.add_ray(x, y, max_x)
         plotter.show()
 
+        # Ask user if they would like to plot another point; if yes, the loop will restart
         user_decision = input("Would you like to check location of another point? Please enter yes or no: ")
 
-        # error handling in input
+        # If user types something other than ‘yes’ or ‘no’ when asked if they would like to check location of a point:
         if user_decision != "yes" and user_decision != "no":
             user_decision = input("Your answer is not recognised. Would you like to check location of a point? "
                                   "Please enter yes or no:  ")
 
 
-# If whole file is executed:
+# If the whole file is executed:
 if __name__ == "__main__":
     polygon_file = "polygon.csv"
     input_file = "input.csv"
